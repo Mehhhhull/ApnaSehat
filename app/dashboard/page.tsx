@@ -1,13 +1,23 @@
-import React from 'react'
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import type { Metadata } from "next";
+import CareDashboard from "./care-dashboard";
 
-async function DashboardPage() {
+export const metadata: Metadata = {
+  title: "Care Threads — ApnaSehat",
+  description: "Your medical history, organized into Care Threads.",
+};
 
-     await auth.protect();
+export default async function DashboardPage() {
+  await auth.protect();
+  const user = await currentUser();
 
   return (
-    <div>DashboardPage</div>
-  )
+    <CareDashboard
+      user={{
+        id: user?.id ?? "unknown",
+        firstName: user?.firstName ?? "there",
+        fullName: user?.fullName ?? "ApnaSehat member",
+      }}
+    />
+  );
 }
-
-export default DashboardPage
