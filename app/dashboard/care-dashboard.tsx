@@ -1,18 +1,16 @@
 "use client";
 
-import { UserButton } from "@clerk/nextjs";
 import {
   Activity,
   ArrowLeft,
   CirclePlus,
   Filter,
-  HeartPulse,
   Search,
   Sparkles,
   Stethoscope,
 } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { DashboardMain, PageHeader } from "./page-header";
 import { generatePatientId } from "@/lib/patient-id";
 import { DEFAULT_PATIENT_ID, SEED_THREADS } from "@/lib/seed-threads";
 import type {
@@ -157,70 +155,22 @@ export default function CareDashboard({ user }: { user: DashboardUser }) {
   }
 
   return (
-    <main className="min-h-screen bg-[#f8faf8] text-[#123c32]">
-      <nav className="sticky top-0 z-40 border-b border-[#dce9e4]/70 bg-[#f8faf8]/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 lg:px-8">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="flex items-center gap-2.5 text-[#123c32]"
+    <DashboardMain>
+        <PageHeader
+          kicker="Care stories"
+          title="Care Threads"
+          description={`Patient ${patientId}. One condition, one timeline, every visit in context.`}
+          action={
+            <button
+              type="button"
+              onClick={() => setCreating(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#163c34] px-4 py-2.5 text-sm font-semibold text-white"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0d513f] text-white shadow-lg shadow-[#0d513f]/20">
-                <HeartPulse size={18} />
-              </div>
-              <span className="text-[19px] font-semibold tracking-[-0.03em]">
-                Apna<span className="text-[#25836a]">Sehat</span>
-              </span>
-            </Link>
-            <span className="hidden rounded-full bg-[#e4f4ed] px-3 py-1 text-[11px] font-medium text-[#27725f] sm:inline">
-              Care Threads
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="hidden text-right sm:block">
-              <div className="text-[10px] uppercase tracking-wider text-[#91a29d]">
-                Patient ID
-              </div>
-              <div className="font-mono text-sm font-semibold text-[#214e42]">
-                {patientId}
-              </div>
-            </div>
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: "h-10 w-10",
-                },
-              }}
-            />
-          </div>
-        </div>
-      </nav>
-
-      <div className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
-        <div className="mb-8 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
-          <div>
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-[#91a29d]">
-              Good {new Date().getHours() < 12 ? "morning" : "afternoon"}
-            </div>
-            <h1 className="mt-1 text-3xl font-semibold tracking-[-0.04em] text-[#163f35]">
-              {user.firstName} 👋
-            </h1>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-[#6f837c]">
-              Your medical story, organized into Care Threads — one condition,
-              one timeline, every visit in context.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setCreating(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0d513f] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#0d513f]/20 transition hover:-translate-y-0.5 hover:bg-[#0a4436]"
-          >
-            <CirclePlus size={18} />
-            New Care Thread
-          </button>
-        </div>
+              <CirclePlus size={18} />
+              New Care Thread
+            </button>
+          }
+        />
 
         <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
@@ -353,7 +303,6 @@ export default function CareDashboard({ user }: { user: DashboardUser }) {
             )}
           </section>
         </div>
-      </div>
 
       {creating ? (
         <NewThreadModal
@@ -371,7 +320,7 @@ export default function CareDashboard({ user }: { user: DashboardUser }) {
           }}
         />
       ) : null}
-    </main>
+    </DashboardMain>
   );
 }
 
