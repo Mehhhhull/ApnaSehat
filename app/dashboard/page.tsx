@@ -1,6 +1,10 @@
 import React from 'react'
+import { auth } from "@clerk/nextjs/server";
 
-const DashboardPage = () => {
+async function DashboardPage() {
+
+     await auth.protect();
+
   return (
     <div>DashboardPage</div>
   )
