@@ -1,5 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
+import { saveUser } from "@/app/actions/user.actions";
 import CareDashboard from "./care-dashboard";
 
 export const metadata: Metadata = {
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 export default async function DashboardPage() {
   await auth.protect();
   const user = await currentUser();
+  await saveUser();
 
   return (
     <CareDashboard
