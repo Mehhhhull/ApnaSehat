@@ -1,7 +1,8 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
-import { saveUser } from "@/app/actions/user.actions";
 import CareDashboard from "./care-dashboard";
+import connect from "@/lib/db";
+import User from "@/models/user.models";
 
 export const metadata: Metadata = {
   title: "Care Threads — ApnaSehat",
@@ -11,7 +12,24 @@ export const metadata: Metadata = {
 export default async function DashboardPage() {
   await auth.protect();
   const user = await currentUser();
-  await saveUser();
+
+  if (!user) {
+    return null;
+  }
+
+  await connect();
+  await User.findOneAndUpdate(
+    { clerkId: user.id },
+    {
+      clerkId: user.id,
+      email: user.primaryEmailAddress?.emailAddress,
+      username: user.username ?? undefined,
+      photo: user.imageUrl,
+      firstName: user.firstName ?? undefined,
+      lastName: user.lastName ?? undefined,
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
 
   return (
     <CareDashboard
