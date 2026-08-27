@@ -1,7 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
-import connect from "@/lib/db";
+import connect from "@/lib/database";
 import EmergencyProfile from "@/models/emergency-profile.models";
 
 const newProfile = (fullName: string, clerkId: string) => ({

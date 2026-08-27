@@ -50,7 +50,8 @@ export default function EmergencyQrForm() {
 	}, []);
 
 	const update = (key: keyof Profile, value: string) => setProfile((current) => ({ ...current, [key]: value }));
-	const shareUrl = profile.shareToken && typeof window !== "undefined" ? `${window.location.origin}/emergency/${profile.shareToken}` : "";
+	const appOrigin = typeof window !== "undefined" ? (process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || window.location.origin) : "";
+	const shareUrl = profile.shareToken && appOrigin ? `${appOrigin}/emergency/${profile.shareToken}` : "";
 
 	async function save() {
 		setSaving(true);

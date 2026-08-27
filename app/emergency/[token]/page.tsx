@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import connect from "@/lib/db";
+import connect from "@/lib/database";
 import EmergencyProfile from "@/models/emergency-profile.models";
 
 type EmergencyContact = { name: string; relationship?: string; phone: string };

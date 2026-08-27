@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import ComingSoon from "../coming-soon";
+import AskChat from "./ask-chat";
 
 export const metadata: Metadata = {
   title: "Ask ApnaSehat",
 };
 
 export default function AskPage() {
-  return (
-    <ComingSoon
-      kicker="Assistant"
-      title="Ask ApnaSehat"
-      description="Ask about your timeline, Care Threads and recent visits in plain language."
-    />
-  );
+  return <AskChat />;
 }
