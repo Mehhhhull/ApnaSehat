@@ -5,40 +5,23 @@ import { generatePatientId } from "@/lib/patient-id";
 import { DEFAULT_PATIENT_ID, SEED_THREADS } from "@/lib/seed-threads";
 import type { CareThread, Visit } from "@/lib/types";
 
-const STORAGE_KEY = "apnasehat-care-threads";
 const PATIENT_KEY = "apnasehat-patient-id";
 
 export function useCareThreads() {
   const [threads, setThreads] = useState<CareThread[]>(SEED_THREADS);
-  const [patientId, setPatientId] = useState(DEFAULT_PATIENT_ID);
-  const [hydrated, setHydrated] = useState(false);
+  const [patientId, setPatientId] = useState(() =>
+    typeof window === "undefined"
+      ? DEFAULT_PATIENT_ID
+      : window.localStorage.getItem(PATIENT_KEY) ?? DEFAULT_PATIENT_ID,
+  );
+  const [hydrated] = useState(true);
 
   useEffect(() => {
     const storedPatient = window.localStorage.getItem(PATIENT_KEY);
-    if (storedPatient) {
-      setPatientId(storedPatient);
-    } else {
+    if (!storedPatient) {
       window.localStorage.setItem(PATIENT_KEY, DEFAULT_PATIENT_ID);
     }
-
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored) as CareThread[];
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setThreads(parsed);
-        }
-      } catch {
-        window.localStorage.removeItem(STORAGE_KEY);
-      }
-    }
-    setHydrated(true);
   }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(threads));
-  }, [threads, hydrated]);
 
   const upsertThread = useCallback((next: CareThread) => {
     setThreads((current) => {

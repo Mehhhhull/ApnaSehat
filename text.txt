@@ -1,0 +1,2 @@
+
+This is the cluster, make the database to store care threads actua data in the database server

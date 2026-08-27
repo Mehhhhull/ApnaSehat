@@ -21,7 +21,6 @@ import type {
   VisitType,
 } from "@/lib/types";
 
-const STORAGE_KEY = "apnasehat-care-threads";
 const PATIENT_KEY = "apnasehat-patient-id";
 
 const STATUSES: CareThreadStatus[] = ["active", "monitoring", "resolved"];
@@ -71,7 +70,11 @@ function visitDot(type: VisitType) {
 
 export default function CareDashboard({ user }: { user: DashboardUser }) {
   const [threads, setThreads] = useState<CareThread[]>(SEED_THREADS);
-  const [patientId, setPatientId] = useState(DEFAULT_PATIENT_ID);
+  const [patientId, setPatientId] = useState(() =>
+    typeof window === "undefined"
+      ? DEFAULT_PATIENT_ID
+      : window.localStorage.getItem(PATIENT_KEY) ?? DEFAULT_PATIENT_ID,
+  );
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | CareThreadStatus>(
     "all",
@@ -79,35 +82,31 @@ export default function CareDashboard({ user }: { user: DashboardUser }) {
   const [selectedId, setSelectedId] = useState<string | null>(SEED_THREADS[0]._id);
   const [creating, setCreating] = useState(false);
   const [addingVisit, setAddingVisit] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
+  const [databaseError, setDatabaseError] = useState<string | null>(null);
 
   useEffect(() => {
     const storedPatient = window.localStorage.getItem(PATIENT_KEY);
-    if (storedPatient) {
-      setPatientId(storedPatient);
-    } else {
+    if (!storedPatient) {
       window.localStorage.setItem(PATIENT_KEY, DEFAULT_PATIENT_ID);
     }
 
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored) as CareThread[];
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setThreads(parsed);
-          setSelectedId(parsed[0]._id);
+    void fetch("/api/care-threads")
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to load care threads");
+        return response.json() as Promise<CareThread[]>;
+      })
+      .then((storedThreads) => {
+        setDatabaseError(null);
+        if (storedThreads.length > 0) {
+          setThreads(storedThreads);
+          setSelectedId(storedThreads[0]._id);
         }
-      } catch {
-        window.localStorage.removeItem(STORAGE_KEY);
-      }
-    }
-    setHydrated(true);
+      })
+      .catch((error) => {
+        console.error(error);
+        setDatabaseError("Could not connect to the care database.");
+      });
   }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(threads));
-  }, [threads, hydrated]);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -135,14 +134,29 @@ export default function CareDashboard({ user }: { user: DashboardUser }) {
   };
 
   function upsertThread(next: CareThread) {
+    const threadToSave = { ...next, createdBy: user.id };
     setThreads((current) => {
-      const exists = current.some((thread) => thread._id === next._id);
+      const exists = current.some((thread) => thread._id === threadToSave._id);
       if (exists) {
-        return current.map((thread) => (thread._id === next._id ? next : thread));
+        return current.map((thread) =>
+          thread._id === threadToSave._id ? threadToSave : thread,
+        );
       }
-      return [next, ...current];
+      return [threadToSave, ...current];
     });
-    setSelectedId(next._id);
+    setSelectedId(threadToSave._id);
+    void fetch("/api/care-threads", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(threadToSave),
+    }).then((response) => {
+      if (!response.ok) {
+        console.error("Failed to save care thread");
+        setDatabaseError("Could not save changes to the care database.");
+        return;
+      }
+      setDatabaseError(null);
+    });
   }
 
   function addVisit(thread: CareThread, visit: Visit) {
@@ -171,6 +185,11 @@ export default function CareDashboard({ user }: { user: DashboardUser }) {
             </button>
           }
         />
+        {databaseError ? (
+          <p className="mb-6 rounded-xl border border-[#f1c7c2] bg-[#fff4f2] px-4 py-3 text-sm text-[#a33b30]" role="alert">
+            {databaseError} Check the MongoDB connection settings.
+          </p>
+        ) : null}
 
         <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
