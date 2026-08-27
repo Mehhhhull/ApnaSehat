@@ -1,4 +1,4 @@
-import mongoose,{ Mongoose} from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 import dns from "dns";
 
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
@@ -6,21 +6,27 @@ dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 
 
-const MONGO_URI=process.env.MONGO_URI!;
+const mongoUri = process.env.MONGODB_URI;
+
+if (!mongoUri) {
+    throw new Error("Missing MONGODB_URI environment variable");
+}
 
 interface MongooseConn{
     conn:Mongoose|null;
     promise:Promise<Mongoose>|null;
 }
 
-let cached:MongooseConn=(global as any).mongoose;
-
-if(!cached){
-    cached=(global as any).mongoose={
-        conn:null,
-        promise:null
-    }
+declare global {
+    var userMongooseCache: MongooseConn | undefined;
 }
+
+const cached:MongooseConn=global.userMongooseCache ?? {
+    conn:null,
+    promise:null,
+};
+
+global.userMongooseCache=cached;
     
 
 const connect = async ()=>{
@@ -28,8 +34,7 @@ const connect = async ()=>{
         return cached.conn;
     }
 
-    cached.promise=cached.promise||mongoose.connect(MONGO_URI,{
-        dbName:"apnasehat",
+    cached.promise=cached.promise||mongoose.connect(mongoUri,{
         bufferCommands:false,
         connectTimeoutMS:10000,
     })
