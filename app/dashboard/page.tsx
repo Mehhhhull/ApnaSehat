@@ -1,4 +1,4 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 import CareDashboard from "./care-dashboard";
 import connect from "@/lib/db";
@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-  await auth.protect();
   const user = await currentUser();
 
   if (!user) {
@@ -28,7 +27,7 @@ export default async function DashboardPage() {
       firstName: user.firstName ?? undefined,
       lastName: user.lastName ?? undefined,
     },
-    { upsert: true, new: true, setDefaultsOnInsert: true }
+    { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
   );
 
   return (

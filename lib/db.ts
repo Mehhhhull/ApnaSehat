@@ -1,4 +1,9 @@
 import mongoose,{ Mongoose} from "mongoose";
+import dns from "dns";
+
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
+
+
 
 
 const MONGO_URI=process.env.MONGO_URI!;
@@ -30,6 +35,7 @@ const connect = async ()=>{
     })
 
     cached.conn=await cached.promise;
+    console.log("mongodb connected successfully");
 
     return cached.conn;
 }
