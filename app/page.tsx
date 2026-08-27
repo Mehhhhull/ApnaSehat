@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SignInButton, SignUpButton, UserButton, useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 const timeline = [
   {
@@ -115,12 +116,18 @@ function ShieldIcon() {
 export default function Home() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const { isSignedIn } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isSignedIn) {
+      router.replace("/dashboard");
+    }
+  }, [isSignedIn, router]);
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#f8faf8] text-[#123c32]">
-      {/* =====================================================
-          NAVBAR
-      ===================================================== */}
+    
+     
 
       <nav className="fixed left-0 right-0 top-0 z-50 border-b border-[#dce9e4]/70 bg-[#f8faf8]/85 backdrop-blur-xl">
         <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-5 lg:px-8">
@@ -180,13 +187,13 @@ export default function Home() {
           <div className="hidden items-center gap-5 md:flex">
             {!isSignedIn ? (
               <>
-                <SignInButton mode="modal">
+                <SignInButton mode="modal" forceRedirectUrl="/dashboard">
                   <button className="text-sm font-medium text-[#557069] transition hover:text-[#0d513f]">
                     Login
                   </button>
                 </SignInButton>
 
-                <SignUpButton mode="modal">
+                <SignUpButton mode="modal" forceRedirectUrl="/dashboard">
                   <button className="rounded-full bg-[#0d513f] px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-[#0d513f]/20 transition hover:-translate-y-0.5 hover:bg-[#0a4436]">
                     Get Started
                   </button>
@@ -227,13 +234,13 @@ export default function Home() {
 
               {!isSignedIn ? (
                 <>
-                  <SignInButton mode="modal">
+                  <SignInButton mode="modal" forceRedirectUrl="/dashboard">
                     <button className="text-left">
                       Login
                     </button>
                   </SignInButton>
 
-                  <SignUpButton mode="modal">
+                  <SignUpButton mode="modal" forceRedirectUrl="/dashboard">
                     <button className="rounded-full bg-[#0d513f] px-5 py-3 text-center font-medium text-white">
                       Get Started
                     </button>
@@ -259,9 +266,6 @@ export default function Home() {
         )}
       </nav>
 
-      {/* =====================================================
-          HERO
-      ===================================================== */}
 
       <section className="relative px-5 pb-20 pt-36 lg:px-8 lg:pb-28 lg:pt-44">
         <div className="pointer-events-none absolute left-[-180px] top-24 h-[500px] w-[500px] rounded-full bg-[#d7f1e9] opacity-60 blur-3xl" />
@@ -292,7 +296,7 @@ export default function Home() {
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               {!isSignedIn ? (
-                <SignUpButton mode="modal">
+                <SignUpButton mode="modal" forceRedirectUrl="/dashboard">
                   <button className="group flex items-center justify-center gap-3 rounded-full bg-[#0d513f] px-7 py-4 text-sm font-semibold text-white shadow-xl shadow-[#0d513f]/20 transition duration-300 hover:-translate-y-1 hover:bg-[#093e31]">
                     Start Your Health Memory
 
@@ -414,7 +418,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Dashboard Cards */}
+                
                 <div className="grid grid-cols-2 gap-3">
                   <div className="rounded-2xl border border-[#e3ebe8] bg-white p-4">
                     <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-[#e5f5ef] text-[#24765f]">
@@ -497,10 +501,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* =====================================================
-          TRUST STRIP
-      ===================================================== */}
-
+     
       <section className="border-y border-[#e2ebe7] bg-white/60 px-5 py-7">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-12 gap-y-4 text-xs font-medium uppercase tracking-[0.14em] text-[#8da09a]">
           <span>Private by design</span>
@@ -519,9 +520,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* =====================================================
-          TIMELINE
-      ===================================================== */}
+
 
       <section
         id="timeline"
@@ -666,9 +665,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* =====================================================
-          AI CARE THREADS
-      ===================================================== */}
 
       <section
         id="ai"
@@ -820,9 +816,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* =====================================================
-          SECURITY
-      ===================================================== */}
+    
 
       <section
         id="security"
@@ -885,9 +879,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* =====================================================
-          STATS
-      ===================================================== */}
+
 
       <section className="px-5 pb-24 lg:px-8">
         <div className="mx-auto grid max-w-6xl overflow-hidden rounded-[30px] bg-[#0d513f] sm:grid-cols-3">
@@ -916,9 +908,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* =====================================================
-          TESTIMONIAL
-      ===================================================== */}
 
       <section className="bg-[#f0f6f3] px-5 py-24 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
@@ -947,9 +936,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* =====================================================
-          FINAL CTA
-      ===================================================== */}
 
       <section className="px-5 py-24 lg:px-8 lg:py-28">
         <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[32px] bg-[#0d513f] px-7 py-16 text-center shadow-[0_30px_90px_rgba(13,81,63,0.20)] sm:px-12">
@@ -970,7 +956,7 @@ export default function Home() {
             </p>
 
             {!isSignedIn ? (
-              <SignUpButton mode="modal">
+              <SignUpButton mode="modal" forceRedirectUrl="/dashboard">
                 <button className="group mt-9 inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 text-sm font-semibold text-[#174d3e] shadow-xl transition hover:-translate-y-1">
                   Create Your Health Memory
 
@@ -995,9 +981,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* =====================================================
-          FOOTER
-      ===================================================== */}
 
       <footer
         id="about"
