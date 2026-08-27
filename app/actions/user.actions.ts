@@ -1,7 +1,7 @@
 "use server";
 
 import { currentUser } from "@clerk/nextjs/server";
-import connect from "@/lib/db";
+import connect from "@/lib/database";
 import User from "@/models/user.models";
 
 export async function saveUser() {

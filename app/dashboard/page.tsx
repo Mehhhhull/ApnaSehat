@@ -1,7 +1,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 import CareDashboard from "./care-dashboard";
-import connect from "@/lib/db";
+import connect from "@/lib/database";
 import User from "@/models/user.models";
 
 export const metadata: Metadata = {
