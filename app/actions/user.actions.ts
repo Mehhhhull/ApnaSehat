@@ -29,6 +29,6 @@ export async function saveUser() {
       firstName: clerkUser.firstName ?? undefined,
       lastName: clerkUser.lastName ?? undefined,
     },
-    { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
+    { upsert: true, new: true, setDefaultsOnInsert: true }
   );
 }

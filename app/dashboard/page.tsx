@@ -27,7 +27,7 @@ export default async function DashboardPage() {
       firstName: user.firstName ?? undefined,
       lastName: user.lastName ?? undefined,
     },
-    { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
+    { upsert: true, new: true, setDefaultsOnInsert: true }
   );
 
   return (
